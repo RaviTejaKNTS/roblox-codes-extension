@@ -1,0 +1,13 @@
+{
+  "name": "roblox-codes-extension",
+  "version": "1.0.0",
+  "description": "Roblox codes panel injected directly on Roblox pages.",
+  "type": "module",
+  "scripts": {
+    "build": "vite build"
+  },
+  "devDependencies": {
+    "vite": "^5.4.0",
+    "vite-plugin-static-copy": "^0.17.1"
+  }
+}

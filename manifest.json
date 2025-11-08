@@ -1,0 +1,37 @@
+{
+  "manifest_version": 3,
+  "name": "Bloxodes – Roblox Game Codes",
+  "version": "1.0.0",
+  "description": "See active Roblox game codes directly on each game's page. Always up to date with Bloxodes — your trusted source for Roblox codes.",
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "host_permissions": [
+    "https://www.roblox.com/*",
+    "https://web.roblox.com/*",
+    "https://*.supabase.co/functions/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.roblox.com/games/*",
+        "https://web.roblox.com/games/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "css": [
+        "styles.css"
+      ],
+      "run_at": "document_start"
+    }
+  ],
+  "action": {
+    "default_title": "Bloxodes – Roblox Codes"
+  }
+}

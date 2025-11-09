@@ -35,5 +35,20 @@ It now calls a Supabase Edge Function so you can keep private keys off the clien
 
 Implement the function using the service role key (kept server-side) or other secure credentials, and return only the data the extension needs.
 
+## Packaging for the Chrome Web Store
+1. Ensure dependencies are installed (`npm install`) and run `npm run build`. This emits the MV3 bundle, copies the manifest, and pulls icons into `dist/`.
+2. Inspect `dist/manifest.json` to confirm the version string, description, permissions, and script paths match what you intend to ship.
+3. From inside `dist/`, create the upload artifact (for example `zip -r ../bloxodes-<version>.zip .`). Only include the built assets—no `node_modules`, `.git`, or tooling files.
+4. Load the `dist/` folder via **Load unpacked** for a manual smoke test on both `www.roblox.com` and `web.roblox.com`.
+5. Upload the `.zip` in the Chrome Web Store dashboard, fill out the metadata, and keep the archive so you can diff future submissions.
+
+## Pre-release checklist
+- Bump the semantic version in both `manifest.json` and `package.json` before every store submission.
+- Confirm only the required host permissions are listed (the extension now limits itself to your Supabase Edge URL).
+- Capture updated screenshots (1280×800 recommended) that show the panel, fallback states, and copy-to-clipboard flow.
+- Host a short privacy policy/support page that states no personal data is collected—the listing requires these URLs.
+- Run `npm run build` locally; if it fails because `vite` is missing, rerun `npm install` before retrying the build.
+- Test error handling by temporarily blocking the edge endpoint—you should see the in-product fallback panel with the retry button.
+
 
 Generated on: 2025-10-29T21:16:09.483552

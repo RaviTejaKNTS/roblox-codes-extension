@@ -149,10 +149,19 @@
       }
 
       const payload = response.data || {};
-      return sanitizeData(payload);
+      return {
+        ok: true,
+        data: sanitizeData(payload),
+        error: null
+      };
     } catch (err) {
-      console.warn('[Bloxodes] Failed to reach edge function:', err);
-      return sanitizeData(null);
+      const message = err?.message || 'edge-call-failed';
+      console.warn('[Bloxodes] Failed to reach edge function:', message);
+      return {
+        ok: false,
+        data: sanitizeData(null),
+        error: message
+      };
     }
   }
 
@@ -263,6 +272,51 @@
     return panel;
   }
 
+  function buildStatusPanel({ title, message, ctaLabel, onCtaClick, tone = 'info' }) {
+    const panel = document.createElement('div');
+    const modifier = tone ? ` bloxodes-panel--${tone}` : '';
+    panel.className = `bloxodes-panel bloxodes-panel--status${modifier}`;
+    panel.dataset.bloxodesPanel = 'true';
+
+    const buttonMarkup = ctaLabel
+      ? `<button class="bloxodes-status-btn" type="button">${ctaLabel}</button>`
+      : '';
+
+    panel.innerHTML = `
+      <div class="bloxodes-head">
+        <div>
+          <h2 class="bloxodes-title">${title}</h2>
+          <p class="bloxodes-subtitle">${message}</p>
+        </div>
+        ${buttonMarkup}
+      </div>
+    `;
+
+    if (ctaLabel && typeof onCtaClick === 'function') {
+      const btn = panel.querySelector('.bloxodes-status-btn');
+      if (btn) {
+        let busy = false;
+        btn.addEventListener('click', async () => {
+          if (busy) return;
+          busy = true;
+          const prevText = btn.textContent;
+          btn.textContent = 'Retrying…';
+          btn.disabled = true;
+          try {
+            await onCtaClick({ button: btn });
+          } finally {
+            if (!btn.isConnected) return;
+            btn.disabled = false;
+            btn.textContent = prevText;
+            busy = false;
+          }
+        });
+      }
+    }
+
+    return panel;
+  }
+
   // wait for container
   function waitForTabsContainer() {
     return new Promise((resolve) => {
@@ -283,70 +337,171 @@
     });
   }
 
-  // main
-  const tabs = await waitForTabsContainer();
-  if (!tabs) return;
+  async function loadData({ bypassCache = false } = {}) {
+    const normalizedUrl = normalizeRobloxUrl(location.href);
+    const placeId = getRobloxPlaceId(normalizedUrl);
+    const pageName = getGameNameFromPage();
 
-  const currentUrl = normalizeRobloxUrl(location.href);
-  const placeId = getRobloxPlaceId(currentUrl);
-  const pageName = getGameNameFromPage();
+    if (!bypassCache) {
+      const memoryCachedRaw = getMemoryCache(normalizedUrl);
+      const memoryCached = memoryCachedRaw ? sanitizeData(memoryCachedRaw) : null;
+      if (memoryCached?.game) {
+        return {
+          data: memoryCached,
+          status: 'cache',
+          error: null
+        };
+      }
 
-  const memoryCachedRaw = getMemoryCache(currentUrl);
-  const memoryCached = memoryCachedRaw ? sanitizeData(memoryCachedRaw) : null;
-  const diskCachedRaw = memoryCached ? null : await getCache(currentUrl);
-  const diskCached = diskCachedRaw ? sanitizeData(diskCachedRaw) : null;
-  let data;
-  if (memoryCached) {
-    data = memoryCached;
-  } else if (diskCached) {
-    data = diskCached;
-    setMemoryCache(currentUrl, data);
-  } else {
-    data = await fetchGameAndCodes({
-      robloxUrl: currentUrl,
+      const diskCachedRaw = await getCache(normalizedUrl);
+      const diskCached = diskCachedRaw ? sanitizeData(diskCachedRaw) : null;
+      if (diskCached?.game) {
+        setMemoryCache(normalizedUrl, diskCached);
+        return {
+          data: diskCached,
+          status: 'cache',
+          error: null
+        };
+      }
+    } else {
+      memoryCache.delete(normalizedUrl);
+    }
+
+    const result = await fetchGameAndCodes({
+      robloxUrl: normalizedUrl,
       robloxPlaceId: placeId,
       gameName: pageName
     });
-    await setCache(currentUrl, data);
-    setMemoryCache(currentUrl, data);
+
+    const nextStatus = result.ok
+      ? result.data?.game
+        ? 'fresh'
+        : 'empty'
+      : 'error';
+
+    if (result.ok && result.data?.game) {
+      await setCache(normalizedUrl, result.data);
+      setMemoryCache(normalizedUrl, result.data);
+    }
+
+    return {
+      data: result.data,
+      status: nextStatus,
+      error: result.error || null
+    };
   }
 
-  // only surface UI when we have a matching article
-  if (!data?.game) return;
+  const tabs = await waitForTabsContainer();
+  if (!tabs) return;
 
-  const panel = buildPanel({
-    game: data.game,
-    codes: data.codes || [],
-    siteBaseUrl: data.siteBaseUrl || DEFAULT_SITE_BASE_URL,
-    totalCodes: data.totalCodes,
-    activeCount: typeof data.activeCount === 'number' ? data.activeCount : data.activeCount
-  });
+  let mountedPanel = null;
+  let detachPinnedPanel = null;
 
-  const keepPanelPinned = (container, node) => {
-    if (!container || !node) return;
-    let isAdjusting = false;
+  function mountPanel(node) {
+    if (mountedPanel?.isConnected) {
+      mountedPanel.remove();
+    }
+    if (typeof detachPinnedPanel === 'function') {
+      detachPinnedPanel();
+      detachPinnedPanel = null;
+    }
+    tabs.prepend(node);
+    detachPinnedPanel = keepPanelPinned(tabs, node);
+    mountedPanel = node;
+  }
 
-    const adjust = () => {
-      if (!node.isConnected) return;
-      const firstElement = Array.from(container.children).find((el) => el.nodeType === Node.ELEMENT_NODE);
+  function renderDataPanel(data) {
+    const panel = buildPanel({
+      game: data.game,
+      codes: data.codes || [],
+      siteBaseUrl: data.siteBaseUrl || DEFAULT_SITE_BASE_URL,
+      totalCodes: data.totalCodes,
+      activeCount: data.activeCount
+    });
+    mountPanel(panel);
+  }
+
+  function renderNoMatchPanel() {
+    const panel = buildStatusPanel({
+      title: 'No codes yet',
+      message: 'We have not published a guide for this experience. Check back soon.',
+      tone: 'info'
+    });
+    mountPanel(panel);
+  }
+
+  function renderErrorPanel(errorMessage) {
+    const friendlyMessage =
+      errorMessage === 'edge-status-429'
+        ? 'We are receiving a lot of traffic right now. Please try again shortly.'
+        : 'We could not reach Bloxodes right now. Check your connection and try again.';
+    const panel = buildStatusPanel({
+      title: 'Codes are unavailable',
+      message: friendlyMessage,
+      ctaLabel: 'Try again',
+      onCtaClick: () => hydrateAndRender({ bypassCache: true }),
+      tone: 'error'
+    });
+    mountPanel(panel);
+  }
+
+  function renderResult(result) {
+    if (result.data?.game) {
+      renderDataPanel(result.data);
+      return;
+    }
+
+    if (result.status === 'error') {
+      renderErrorPanel(result.error);
+      return;
+    }
+
+    renderNoMatchPanel();
+  }
+
+  async function hydrateAndRender({ bypassCache = false } = {}) {
+    const result = await loadData({ bypassCache });
+    renderResult(result);
+  }
+
+  function keepPanelPinned(container, node) {
+    if (!container || !node) return () => {};
+    let adjusting = false;
+
+    const ensureTopPosition = () => {
+      if (!node.isConnected || node.parentElement !== container) {
+        adjusting = true;
+        try {
+          container.prepend(node);
+        } catch {
+          // ignore
+        }
+        queueMicrotask(() => {
+          adjusting = false;
+        });
+        return;
+      }
+
+      const firstElement = container.firstElementChild;
       if (firstElement !== node) {
-        isAdjusting = true;
+        adjusting = true;
         container.insertBefore(node, firstElement ?? null);
         requestAnimationFrame(() => {
-          isAdjusting = false;
+          adjusting = false;
         });
       }
     };
 
-    adjust();
+    ensureTopPosition();
 
     const observer = new MutationObserver(() => {
-      if (isAdjusting) return;
-      adjust();
+      if (adjusting) return;
+      ensureTopPosition();
     });
     observer.observe(container, { childList: true });
-  };
 
-  tabs.prepend(panel);
-  keepPanelPinned(tabs, panel);
+    return () => observer.disconnect();
+  }
+
+  hydrateAndRender();
 })();

@@ -5,6 +5,7 @@
   "description": "See active Roblox game codes directly on each game's page. Always up to date with Bloxodes — your trusted source for Roblox codes.",
   "icons": {
     "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
   },
@@ -12,9 +13,7 @@
     "service_worker": "background.js"
   },
   "host_permissions": [
-    "https://www.roblox.com/*",
-    "https://web.roblox.com/*",
-    "https://*.supabase.co/functions/*"
+    "https://bmwksaykcsndsvgspapz.supabase.co/functions/*"
   ],
   "content_scripts": [
     {

@@ -1,231 +1,383 @@
-/* PANEL WRAPPER */
+/* Palette + base */
 .bloxodes-panel {
-    width: 100%;
-    background: #111425; /* dark surface */
-    border: 1px solid rgba(58, 63, 92, 0.45);
-    border-radius: 1.9rem;
-    padding: 1.6rem 1.7rem 1.15rem;
-    margin-bottom: 1.25rem;
-    color: #e2e8ff;
-    box-shadow: 0 32px 60px -40px rgba(10, 13, 23, 0.7);
-    box-sizing: border-box;
-    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  }
-  .bloxodes-panel--status .bloxodes-head {
-    align-items: center;
-  }
-  .bloxodes-panel--info {
-    border-color: rgba(99, 102, 241, 0.45);
-  }
-  .bloxodes-panel--error {
-    border-color: rgba(248, 113, 113, 0.55);
-    background: linear-gradient(135deg, rgba(44, 12, 20, 0.85), rgba(23, 14, 24, 0.9));
-  }
-  
-  /* HEADER */
-  .bloxodes-head {
-    margin-bottom: 1.2rem;
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 1.25rem;
-  }
+  --panel-bg: #191b2b;
+  --panel-border: rgba(92, 101, 134, 0.7);
+  --card-bg: #191b2b;
+  --card-border: rgba(92, 101, 134, 0.6);
+  --text-strong: #f4f6ff;
+  --text: #dfe4f4;
+  --text-muted: rgba(223, 228, 244, 0.72);
+  --accent: #6f7ce8;
+  --accent-strong: #8c9af5;
+  --badge-bg: rgba(111, 124, 232, 0.2);
+  --shadow: 0 26px 60px -36px rgba(0, 0, 0, 0.7);
+  position: relative;
+  width: 100%;
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 22px;
+  padding: 0;
+  margin-bottom: 20px;
+  color: var(--text);
+  box-shadow: var(--shadow);
+  box-sizing: border-box;
+  font-family: "Inter", "SF Pro Display", "Segoe UI", system-ui, sans-serif;
+  overflow: hidden;
+}
 
-/* top-right link button */
+.bloxodes-panel--status {
+  background: linear-gradient(180deg, #0f1325 0%, #0b0f1d 100%);
+}
+.bloxodes-panel--info {
+  border-color: rgba(129, 140, 248, 0.45);
+}
+.bloxodes-panel--error {
+  border-color: rgba(248, 113, 113, 0.5);
+  background: linear-gradient(180deg, rgba(56, 20, 29, 0.9) 0%, rgba(25, 12, 21, 0.9) 100%);
+}
+
+/* Header */
+.bloxodes-head {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 18px 14px;
+  border-bottom: 1px solid rgba(92, 101, 134, 0.55);
+  background: var(--panel-bg);
+  z-index: 1;
+}
+
+.bloxodes-head-main {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+
+.bloxodes-head-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 13px;
+  background: #191b2b;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  display: grid;
+  place-items: center;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 10px 25px -20px rgba(0, 0, 0, 0.7);
+}
+
+.bloxodes-head-icon::after {
+  content: "";
+  width: 22px;
+  height: 22px;
+  background: #e9edff;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='7' cy='15' r='4'/%3E%3Cline x1='9.5' y1='12.5' x2='19' y2='3'/%3E%3Cline x1='10.5' y1='11.5' x2='12.5' y2='13.5'/%3E%3Cline x1='16.5' y1='5.5' x2='18.5' y2='7.5'/%3E%3C/svg%3E") center/20px 20px no-repeat;
+  mask-repeat: no-repeat;
+}
+
+.bloxodes-title {
+  margin: 0;
+  font-size: 1.95rem;
+  line-height: 1.12;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--text-strong);
+}
+
+.bloxodes-subtitle {
+  margin: 6px 0 0;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.bloxodes-meta-line {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-size: 0.95rem;
+  color: var(--text-muted);
+}
+
+.bloxodes-meta-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.bloxodes-meta-icon {
+  width: 18px;
+  height: 18px;
+  background: rgba(233, 237, 255, 0.9);
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpolyline points='12 6 12 12 16 14'/%3E%3C/svg%3E") center/18px 18px no-repeat;
+  mask-repeat: no-repeat;
+  opacity: 0.9;
+}
+
+.bloxodes-meta-text strong {
+  color: var(--text-strong);
+}
+
+.bloxodes-meta-muted {
+  color: var(--text-muted);
+}
+
+.bloxodes-active-pill {
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: #0f1426;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  font-weight: 700;
+  color: var(--text-strong);
+  font-size: 0.86rem;
+  line-height: 1;
+}
+
+.bloxodes-top-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #0f1426;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: var(--text);
+  font-size: 0.86rem;
+  padding: 11px 15px;
+  border-radius: 12px;
+  text-decoration: none;
+  white-space: nowrap;
+  line-height: 1;
+  transition: all 0.12s ease-out;
+}
+
+.bloxodes-top-link:hover {
+  color: var(--text-strong);
+  border-color: rgba(124, 141, 255, 0.6);
+}
+
+/* Codes grid */
+.bloxodes-codes-wrap {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px 14px;
+  position: relative;
+  z-index: 1;
+  padding: 16px;
+  background: transparent;
+}
+
+.bloxodes-code-row {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 18px;
+  padding: 15px 17px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  box-shadow: 0 20px 50px -35px rgba(0, 0, 0, 0.65);
+  transition: all 0.15s ease-out;
+}
+
+.bloxodes-code-row:hover {
+  border-color: rgba(129, 140, 248, 0.65);
+  transform: translateY(-1px);
+}
+
+.bloxodes-code-left {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  min-width: 0;
+  flex: 1;
+}
+
+.bloxodes-rank {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--text-strong);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.02) 100%);
+  border: 1px solid rgba(233, 237, 255, 0.14);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.bloxodes-code-content {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  flex: 1;
+}
+
+.bloxodes-code-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-width: 0;
+  flex-wrap: wrap;
+  row-gap: 6px;
+}
+
+.bloxodes-code-text {
+  font-size: 1.04rem;
+  font-family: "JetBrains Mono", "DM Mono", "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  color: var(--text-strong);
+  white-space: normal;
+  word-break: break-word;
+  line-height: 1.2;
+}
+
+.bloxodes-new {
+  display: inline-flex;
+  align-items: center;
+  padding: 4.5px 9px 4.5px;
+  border-radius: 999px;
+  background: var(--badge-bg);
+  color: var(--accent-strong);
+  border: 1px solid rgba(111, 124, 232, 0.3);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+}
+
+.bloxodes-desc-line {
+  font-size: 0.92rem;
+  line-height: 1.35;
+  color: var(--text-muted);
+  max-width: 100%;
+  white-space: normal;
+}
+
+.bloxodes-code-right {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+}
+
+.bloxodes-copy {
+  background: #0f1426;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 13px;
+  cursor: pointer;
+  color: var(--text);
+  font-size: 0.82rem;
+  line-height: 1.1;
+  transition: all 0.16s ease-out;
+  font-weight: 600;
+}
+
+.bloxodes-copy:hover {
+  color: var(--text-strong);
+  border-color: rgba(124, 141, 255, 0.65);
+}
+
+.bloxodes-copy.is-copied {
+  background: rgba(129, 140, 248, 0.28);
+  border-color: rgba(129, 140, 248, 0.7);
+  color: #0a0c18;
+  font-weight: 700;
+}
+
+.bloxodes-copy-icon {
+  width: 14px;
+  height: 14px;
+  display: inline-block;
+  background: currentColor;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='9' y='9' width='13' height='13' rx='2' ry='2'/%3E%3Cpath d='M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1'/%3E%3C/svg%3E") center/15px 15px no-repeat;
+  mask-repeat: no-repeat;
+}
+
+.bloxodes-footer {
+  margin-top: 12px;
+}
+
+.bloxodes-footer-link {
+  font-size: 0.72rem;
+  color: rgba(226, 232, 255, 0.5);
+  text-decoration: none;
+}
+
+.bloxodes-footer-link:hover {
+  color: var(--text-strong);
+}
+
+.bloxodes-footer-link.muted {
+  cursor: default;
+}
+
+.bloxodes-status-btn {
+  appearance: none;
+  border: 1px solid rgba(226, 232, 255, 0.35);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-strong);
+  font-size: 0.86rem;
+  padding: 10px 14px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-weight: 600;
+}
+
+.bloxodes-status-btn:hover:not(:disabled) {
+  border-color: rgba(226, 232, 255, 0.65);
+  background: rgba(226, 232, 255, 0.08);
+}
+
+.bloxodes-status-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* Responsive grid: 3 → 2 → 1 */
+@media (max-width: 1100px) {
+  .bloxodes-codes-wrap {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 780px) {
+  .bloxodes-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
   .bloxodes-top-link {
-    display: inline-flex;
+    align-self: flex-start;
+  }
+  .bloxodes-code-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .bloxodes-code-right {
+    width: 100%;
+    flex-direction: row;
     align-items: center;
-    gap: 0.35rem;
-    background: rgba(24, 27, 43, 0.3); /* close to --color-surface */
-    border: 1px solid rgba(129, 140, 248, 0.18);
-    color: rgba(226, 232, 255, 0.9);
-    font-size: 0.78rem;
-    padding: 0.7rem 1.2rem 0.7rem 1rem;
-    border-radius: 9999px;
-    text-decoration: none;
-    white-space: nowrap;
-    line-height: 1;
-    transition: all 0.12s ease-out;
+    justify-content: space-between;
   }
-  .bloxodes-top-link:hover {
-    background: rgba(129, 140, 248, 0.16);
-    border-color: rgba(129, 140, 248, 0.45);
-    color: #fff;
+  .bloxodes-desc-line {
+    white-space: normal;
   }
-  .bloxodes-top-link:active {
-    transform: translateY(0.5px);
-  }
-  .bloxodes-status-btn {
-    appearance: none;
-    border: 1px solid rgba(226, 232, 255, 0.35);
-    background: rgba(0, 0, 0, 0.1);
-    color: #f1f5ff;
-    font-size: 0.78rem;
-    padding: 0.55rem 1.25rem;
-    border-radius: 999px;
-    cursor: pointer;
-    transition: all 0.15s ease;
-    font-weight: 600;
-  }
-  .bloxodes-status-btn:hover:not(:disabled) {
-    border-color: rgba(226, 232, 255, 0.65);
-    background: rgba(226, 232, 255, 0.08);
-  }
-  .bloxodes-status-btn:disabled {
-    opacity: 0.6;
-    cursor: default;
+}
+
+@media (max-width: 640px) {
+  .bloxodes-codes-wrap {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
   }
   .bloxodes-title {
-    margin: 0;
-    font-size: 1.5rem;
-    line-height: 1.15;
-    font-weight: 700;
-    letter-spacing: -0.01em;
+    font-size: 1.6rem;
   }
-  .bloxodes-subtitle {
-    margin: 0.35rem 0 0 0;
-    font-size: 0.82rem;
-    line-height: 1.35;
-    color: rgba(150, 158, 192, 0.8);
-  }
-  
-  /* GRID: 3 → 2 → 1 */
-  .bloxodes-codes-wrap {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0.7rem 0.95rem;
-  }
-  
-  /* EACH CODE CARD */
-  .bloxodes-code-row {
-    background: rgba(17, 18, 32, 0.04);
-    border: 1px solid rgba(58, 63, 92, 0.35);
-    border-radius: 1.25rem;
-    padding: 0.6rem 0.85rem 0.55rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.4rem;
-    min-height: 5rem;
-    backdrop-filter: blur(2px);
-  }
-  
-  /* TOP LINE (pill + copy) */
-  .bloxodes-top-line {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.6rem;
-    min-height: 2.05rem;
-  }
-  
-  /* LEFT = pill */
-  .bloxodes-pill {
-    background: linear-gradient(140deg, #818cf8 0%, #6366f1 100%);
-    border-radius: 9999px;
-    padding: 0.45rem 1.2rem 0.4rem 1rem;
-    color: #fff;
-    font-size: 0.78rem;
-    font-weight: 600;
-    line-height: 1;
-    border: 1px solid rgba(255, 255, 255, 0.02);
-    max-width: 75%;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  
-  /* COPY BUTTON */
-  .bloxodes-copy {
-    background: rgba(8, 9, 15, 0.25);
-    border: 1px solid rgba(108, 113, 138, 0.35);
-    border-radius: 9999px;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-    padding: 0.33rem 0.7rem 0.35rem 0.6rem;
-    cursor: pointer;
-    color: rgba(226, 232, 255, 0.9);
-    font-size: 0.67rem;
-    line-height: 1;
-    flex: 0 0 auto;
-    transition: all 0.12s ease-out;
-  }
-  .bloxodes-copy:hover {
-    background: rgba(8, 9, 15, 0.45);
-    border-color: rgba(129, 140, 248, 0.55);
-  }
-  .bloxodes-copy.is-copied {
-    background: rgba(129, 140, 248, 0.3);
-    border-color: rgba(129, 140, 248, 0.7);
-  }
-  .bloxodes-copy-icon {
-    width: 13px;
-    height: 13px;
-    display: inline-block;
-    background: rgba(226, 232, 255, 0.95);
-    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='9' y='9' width='13' height='13' rx='2' ry='2'/%3E%3Cpath d='M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1'/%3E%3C/svg%3E") center/13px 13px no-repeat;
-    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='9' y='9' width='13' height='13' rx='2' ry='2'/%3E%3Cpath d='M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1'/%3E%3C/svg%3E") center/13px 13px no-repeat;
-  }
-  .bloxodes-copy-label {
-    display: inline-block;
-    transform: translateY(-0.2px);
-  }
-  
-  /* DESCRIPTION UNDER TOP LINE */
-  .bloxodes-desc-line {
-    font-size: 0.8rem;
-    line-height: 1.28;
-    color: rgba(226, 232, 255, 0.62);
-    max-width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    margin-left: 0.4rem;
-    margin-top: 0.2rem;
-  }
-  
-  /* FOOTER */
-  .bloxodes-footer {
-    margin-top: 1rem;
-  }
-  .bloxodes-footer-link {
-    font-size: 0.7rem;
-    color: rgba(226, 232, 255, 0.38);
-    text-decoration: none;
-  }
-  .bloxodes-footer-link:hover {
-    color: rgba(226, 232, 255, 0.7);
-  }
-  .bloxodes-footer-link.muted {
-    cursor: default;
-  }
-  
-  /* 2 per row */
-  @media (max-width: 1100px) {
-    .bloxodes-codes-wrap {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-    .bloxodes-pill {
-      max-width: 65%;
-    }
-  }
-  
-  /* 1 per row + multiline desc */
-  @media (max-width: 700px) {
-    .bloxodes-codes-wrap {
-      grid-template-columns: repeat(1, minmax(0, 1fr));
-    }
-    .bloxodes-code-row {
-      padding: 0.65rem 0.7rem 0.6rem;
-    }
-    .bloxodes-top-line {
-      gap: 0.5rem;
-    }
-    .bloxodes-pill {
-      max-width: 60%;
-    }
-    .bloxodes-desc-line {
-      white-space: normal;
-    }
-  }
-  
+}

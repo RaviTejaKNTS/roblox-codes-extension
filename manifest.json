@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Bloxodes – Roblox Game Codes",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "See active Roblox game codes directly on each game's page. Always up to date with Bloxodes — your trusted source for Roblox codes.",
   "icons": {
     "16": "icons/icon16.png",

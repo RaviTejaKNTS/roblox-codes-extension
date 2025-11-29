@@ -165,6 +165,22 @@
     }
   }
 
+  function formatDisplayDate(date) {
+    if (!date || Number.isNaN(date.getTime())) return null;
+    return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+  }
+
+  function relativeLabel(date) {
+    if (!date || Number.isNaN(date.getTime())) return null;
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const dayMs = 1000 * 60 * 60 * 24;
+    const diffDays = Math.floor(diffMs / dayMs);
+    if (diffDays <= 0) return 'Today';
+    if (diffDays === 1) return 'Yesterday';
+    return `${diffDays} days ago`;
+  }
+
   // build UI
   function buildPanel({ game, codes, siteBaseUrl, totalCodes, activeCount }) {
     const panel = document.createElement('div');
@@ -173,6 +189,9 @@
 
     const items = (codes || []).slice(0, 9);
     const gameName = game ? game.name : 'Roblox';
+    const now = new Date();
+    const lastCheckedLabel = formatDisplayDate(now) || 'Today';
+    const lastCheckedRelative = relativeLabel(now);
     const normalizeStatus = (value) => {
       if (typeof value !== 'string') return '';
       return value.trim().toLowerCase();
@@ -208,11 +227,10 @@
           ? '200+'
           : headlineActiveCount
         : headlineActiveCount;
-
     const topRightLink =
       game && siteBaseUrl
         ? `<a class="bloxodes-top-link"
-               href="${siteBaseUrl.replace(/\/$/, '')}/${game.slug}"
+               href="${siteBaseUrl.replace(/\/$/, '')}/codes/${game.slug}"
                target="_blank" rel="noopener noreferrer">
               View full codes guide →
            </a>`
@@ -220,9 +238,16 @@
 
     panel.innerHTML = `
       <div class="bloxodes-head">
-        <div>
-          <h2 class="bloxodes-title">Active ${gameName} Codes</h2>
-          <p class="bloxodes-subtitle">Right now, there are ${headlineActiveCountDisplay} active codes you can use.</p>
+        <div class="bloxodes-head-main">
+          <div class="bloxodes-head-icon" aria-hidden="true"></div>
+          <div>
+            <h2 class="bloxodes-title">Active ${gameName} Codes</h2>
+            <div class="bloxodes-meta-line">
+              <span class="bloxodes-meta-icon" aria-hidden="true"></span>
+              <span class="bloxodes-meta-text">Last checked for new codes on <strong>${lastCheckedLabel}</strong> ${lastCheckedRelative ? `<span class="bloxodes-meta-muted">(${lastCheckedRelative})</span>` : ''}</span>
+              <span class="bloxodes-active-pill">${headlineActiveCountDisplay} active</span>
+            </div>
+          </div>
         </div>
         ${topRightLink}
       </div>
@@ -230,21 +255,29 @@
       <div class="bloxodes-codes-wrap">
         ${items
           .map((c, i) => {
-            const reward =
+            let reward =
               c.rewards_text && c.rewards_text.trim()
                 ? c.rewards_text.trim()
-                : 'Pet and Rewards';
+                : 'No reward listed yet.';
+            if (reward.startsWith('This code gives you')) {
+              reward = reward.substring('This code gives you'.length).trim();
+            }
             return `
-              <div class="bloxodes-code-row" data-index="${i}" data-status="${c.status}">
-                <div class="bloxodes-top-line">
-                  <div class="bloxodes-pill" title="${c.code}">${c.code}</div>
-                  <button class="bloxodes-copy" data-code="${c.code}" type="button" aria-label="Copy ${c.code}">
-                    <span class="bloxodes-copy-icon" aria-hidden="true"></span>
-                    <span class="bloxodes-copy-label">Copy</span>
-                  </button>
-                </div>
-                <div class="bloxodes-desc-line" title="${reward}">
-                  ${reward}
+              <div class="bloxodes-code-row" data-index="${i + 1}" data-status="${c.status}">
+                <div class="bloxodes-code-left">
+                  <span class="bloxodes-rank">${i + 1}</span>
+                  <div class="bloxodes-code-content">
+                    <div class="bloxodes-code-line">
+                      <span class="bloxodes-code-text">${c.code}</span>
+                      <button class="bloxodes-copy" data-code="${c.code}" type="button" aria-label="Copy ${c.code}">
+                        <span class="bloxodes-copy-icon" aria-hidden="true"></span>
+                        <span class="bloxodes-copy-label">Copy</span>
+                      </button>
+                    </div>
+                    <div class="bloxodes-desc-line" title="${reward}">
+                      ${reward}
+                    </div>
+                  </div>
                 </div>
               </div>
             `;
@@ -456,7 +489,8 @@
       return;
     }
 
-    renderNoMatchPanel();
+    // Do not render anything if there is no match
+    // renderNoMatchPanel();
   }
 
   async function hydrateAndRender({ bypassCache = false } = {}) {

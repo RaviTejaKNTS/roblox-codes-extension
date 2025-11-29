@@ -14,7 +14,7 @@ It now calls a Supabase Edge Function so you can keep private keys off the clien
 
 ## Link placement
 - Below the codes panel, it renders a link to your site:
-  `{{siteBaseUrl}}/{{slug}}` (the edge function controls the base URL it returns).
+  `{{siteBaseUrl}}/codes/{{slug}}` (the edge function controls the base URL it returns).
 
 ## Setup
 1. Deploy the Supabase Edge Function that returns `{ game, codes, totalCodes, activeCount, siteBaseUrl }` for a given Roblox page.  

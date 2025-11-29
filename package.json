@@ -1,6 +1,6 @@
 {
   "name": "roblox-codes-extension",
-  "version": "1.0.0",
+  "version": "2.1.0",
   "description": "Roblox codes panel injected directly on Roblox pages.",
   "type": "module",
   "scripts": {
